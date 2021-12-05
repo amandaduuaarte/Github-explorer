@@ -1,5 +1,6 @@
 const path = require('path');
 const htmlWebpckPlugin = require('html-webpack-plugin');
+const reactRefreshWebpackPlugin = require('@pmmmwh/react-refresh-webpack-plugin');
 const isDevelopment = process.env.NODE_ENV !== 'production';
 
 module.exports ={
@@ -18,19 +19,28 @@ module.exports ={
   },
   devServer: {
     static: path.resolve(__dirname, 'public'),
+    hot: true,
   },
   plugins:[
+   isDevelopment &&  new reactRefreshWebpackPlugin(),
     new htmlWebpckPlugin({
       template: path.resolve(__dirname, 'public', 'index.html'),
     })
-  ],
+  ].filter(Boolean),
   module:{
     //como a aplicação vai se portar quando eu tiver cada tipo de arquivo.
     rules:[
       {
         test:/\.jsx$/,
         exclude: /node_modules/,
-        use:'babel-loader',
+        use:{
+          loader: 'babel-loader',
+          options:{
+            plugins:[
+              isDevelopment && require.resolve('react-Refresh/babel')
+            ].filter(Boolean)
+          }
+        },
       },
       {
         test:/\.scss$/,
